@@ -1,5 +1,5 @@
 ![JesterSploit Main Menu](main_menu.png)
-# JesterSploit – The FIRST JesterSploit's WiFi Penetration Testing Framework
+# JesterSploit – Advanced WiFi Penetration Testing Framework
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
