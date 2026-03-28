@@ -1,72 +1,89 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-import logging
+# utils/logger_v2.py - NEW
 import os
-import hashlib
-import json
+import sys
+import logging
+import logging.handlers
+import re
 from pathlib import Path
-from datetime import datetime, timezone
 from typing import Optional
 
-# Global capture log (list of entries)
-capture_log = []
+class SecretMaskingFilter(logging.Filter):
+    """Filter that masks sensitive data in logs"""
+    
+    PATTERNS = [
+        # Discord bot tokens
+        (re.compile(r'[A-Za-z0-9_-]{24}\.[A-Za-z0-9_-]{6}\.[A-Za-z0-9_-]{27}'), '[DISCORD_TOKEN]'),
+        # Telegram bot tokens
+        (re.compile(r'\d+:[\w-]{35}'), '[TELEGRAM_TOKEN]'),
+        # Webhook URLs
+        (re.compile(r'https://discord\.com/api/webhooks/[\w-]+/[\w-]+'), '[WEBHOOK_URL]'),
+        # API keys (generic)
+        (re.compile(r'[\w-]{32,}'), '[API_KEY]'),
+        # MAC addresses (partial)
+        (re.compile(r'([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})'), '[MAC]'),
+    ]
+    
+    def filter(self, record):
+        if hasattr(record, 'msg') and isinstance(record.msg, str):
+            for pattern, replacement in self.PATTERNS:
+                record.msg = pattern.sub(replacement, record.msg)
+        return True
 
-SESSION_ID = None  # will be set by main
-
-attack_logger = None
-bug_logger = None
-engine_logger = None
-
-
-def setup_loggers(session_id: str) -> None:
-    """Initialize loggers with session ID."""
-    global SESSION_ID, attack_logger, bug_logger, engine_logger
-    SESSION_ID = session_id
-
-    # Ensure log directories exist
-    for sub in ["attacks", "bugs", "engine"]:
-        Path(f"data/logs/{sub}").mkdir(parents=True, exist_ok=True)
-
-    attack_logger = logging.getLogger("attack")
+def setup_logging(
+    log_dir: str = None,
+    level: str = "INFO",
+    max_bytes: int = 10 * 1024 * 1024,  # 10MB
+    backup_count: int = 5
+) -> logging.Logger:
+    """Configure logging with rotation and secret masking"""
+    
+    if log_dir is None:
+        log_dir = Path.home() / '.cache' / 'jestersploit' / 'logs'
+    
+    log_dir = Path(log_dir)
+    log_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Main logger
+    logger = logging.getLogger('jestersploit')
+    logger.setLevel(getattr(logging, level.upper(), logging.INFO))
+    
+    # Remove existing handlers
+    logger.handlers.clear()
+    
+    # File handler with rotation
+    file_handler = logging.handlers.RotatingFileHandler(
+        log_dir / 'jestersploit.log',
+        maxBytes=max_bytes,
+        backupCount=backup_count
+    )
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    ))
+    file_handler.addFilter(SecretMaskingFilter())
+    logger.addHandler(file_handler)
+    
+    # Console handler (no sensitive data)
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(logging.Formatter(
+        '%(levelname)s: %(message)s'
+    ))
+    console_handler.addFilter(SecretMaskingFilter())
+    logger.addHandler(console_handler)
+    
+    # Attack logs separate
+    attack_logger = logging.getLogger('jestersploit.attack')
     attack_logger.setLevel(logging.INFO)
-    attack_handler = logging.FileHandler(f"data/logs/attacks/attack_{SESSION_ID}.log")
-    attack_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
+    attack_handler = logging.handlers.RotatingFileHandler(
+        log_dir / 'attacks.log',
+        maxBytes=max_bytes,
+        backupCount=backup_count
+    )
+    attack_handler.setFormatter(logging.Formatter(
+        '%(asctime)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    ))
+    attack_handler.addFilter(SecretMaskingFilter())
     attack_logger.addHandler(attack_handler)
-
-    bug_logger = logging.getLogger("bug")
-    bug_logger.setLevel(logging.ERROR)
-    bug_handler = logging.FileHandler(f"data/logs/bugs/bug_{SESSION_ID}.log")
-    bug_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
-    bug_logger.addHandler(bug_handler)
-
-    engine_logger = logging.getLogger("engine")
-    engine_logger.setLevel(logging.INFO)
-    engine_handler = logging.FileHandler(f"data/logs/engine/engine_{SESSION_ID}.log")
-    engine_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
-    engine_logger.addHandler(engine_handler)
-
-
-def log_capture(event_type: str, bssid: str, essid: str, file_path: Optional[str]) -> str:
-    """Log capture event with SHA256."""
-    sha256 = None
-    if file_path and os.path.exists(file_path):
-        with open(file_path, 'rb') as f:
-            sha256 = hashlib.sha256(f.read()).hexdigest()
-    entry = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "session_id": SESSION_ID,
-        "event": event_type,
-        "bssid": bssid,
-        "essid": essid,
-        "file": file_path,
-        "sha256": sha256
-    }
-    capture_log.append(entry)
-    # Write to report file
-    report_file = f"/tmp/jester_report_{SESSION_ID}.jsonl"
-    with open(report_file, 'a') as f:
-        f.write(json.dumps(entry) + '\n')
-    if attack_logger:
-        attack_logger.info(f"{event_type}: {bssid} {essid} {file_path}")
-    return sha256
+    
+    return logger
