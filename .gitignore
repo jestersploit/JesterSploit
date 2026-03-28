@@ -1,0 +1,22 @@
+# Configuration (contains secrets)
+jesterconfig.json
+
+# Data directories
+data/captures/
+data/logs/
+data/reports/
+
+# Temporary files
+*.pyc
+__pycache__/
+*.log
+*.pcap
+*.pcapng
+*.cap
+*.22000
+*.cracked
+*.txt
+
+# Session files
+/tmp/jester_*
+*.jsonl
