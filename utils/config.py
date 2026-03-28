@@ -6,7 +6,7 @@ import os
 import json
 from typing import Any, Dict
 
-CONFIG_FILE = os.path.expanduser("~/.jesterphishing.json")
+CONFIG_FILE = os.path.expanduser("~/.jesterconfig.json")
 
 # Default configuration
 DEFAULT_CONFIG: Dict[str, Any] = {
