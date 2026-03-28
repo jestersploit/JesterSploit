@@ -57,6 +57,38 @@ def send_telegram_message(message: str, retries: int = 3) -> bool:
             time.sleep(2 ** attempt)
     return False
 
+def telegram_command_handler():
+    global telegram_running
+    last_update_id = 0
+    logger.info("Telegram command handler started")
+    while telegram_running:
+        try:
+            if config.get("telegram", {}).get("enabled", False):
+                token = config["telegram"]["token"]
+                chat_id = config["telegram"]["chat_id"]
+                if not token or not chat_id:
+                    time.sleep(5)
+                    continue
+                
+                url = f"https://api.telegram.org/bot{token}/getUpdates"
+                params = {"offset": last_update_id + 1, "timeout": 30}
+                response = requests.get(url, params=params, timeout=35)
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get("ok") and data.get("result"):
+                        for update in data["result"]:
+                            last_update_id = update["update_id"]
+                            if "message" in update:
+                                msg = update["message"]
+                                if msg.get("chat", {}).get("id") == chat_id:
+                                    text = msg.get("text", "").strip()
+                                    if text:
+                                        logger.info(f"Received command: {text}")
+                                        process_telegram_command(text)
+        except Exception as e:
+            logger.error(f"Telegram polling error: {e}")
+        time.sleep(1)
+
 def process_telegram_command(command):
     import shlex
     global current_wordlists, hardware_available, gpu_name, gpu_available, interface, monitor_interface, capture_log, SESSION_ID
