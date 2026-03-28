@@ -769,25 +769,23 @@ def main():
     print_status("Detecting USB wireless adapter...", "info")
     detect_adapter()
 
-    # Start Telegram thread if enabled
+        # Start Telegram thread if enabled
     if config.get("telegram", {}).get("enabled", False):
         print_status("Starting Telegram command handler...", "info")
         telegram_thread = threading.Thread(target=telegram_command_handler, daemon=True)
         telegram_thread.start()
         print_status("Telegram bot active", "success")
-        # Send welcome message after a short delay
+        
+        # Send welcome after a delay (don't block)
         def send_welcome():
-    time.sleep(3)
-    welcome = f"""JESTERSPLOIT ONLINE
+            time.sleep(3)
+            welcome = f"""JESTERSPLOIT ONLINE
 Session: {SESSION_ID}
 Hardware: {'Connected' if hardware_available else 'No adapter'}
 GPU: {gpu_name if gpu_available else 'None'}
 Wordlists: {len(current_wordlists)}
 
 Type /help for commands"""
-    send_telegram_message(welcome)
-
-⚠️ *Use responsibly. Authorized testing only.*"""
             send_telegram_message(welcome)
         threading.Thread(target=send_welcome, daemon=True).start()
     else:
