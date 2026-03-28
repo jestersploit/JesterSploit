@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-JESTERSPLOIT – Advanced WiFi Penetration Testing Framework
+JESTERSPLOIT – WiFi Penetration Testing Framework
 Main Orchestrator – Complete Edition
 """
 
@@ -651,7 +651,7 @@ def show_main_menu():
     print(f"{COLOR_BOLD}{COLOR_GREEN}│  THREAT: {COLOR_BROWN}Mid{COLOR_GREEN}                                                                                       │{COLOR_RESET}")
     print(f"{COLOR_BOLD}{COLOR_GREEN}│  CAPABILITY: {COLOR_SALMON}Tactical WiFi Compromise{COLOR_GREEN}                                                              │{COLOR_RESET}")
     print(f"{COLOR_BOLD}{COLOR_GREEN}│  DEPLOYMENT: {COLOR_DARK_CYAN}CLIENT-SERVER{COLOR_TEAL}  - Telegram C2 / Terminal{COLOR_GREEN}                                               │{COLOR_RESET}")
-    print(f"{COLOR_BOLD}{COLOR_GREEN}│  TARGET: {COLOR_DARK_RED}WPA/WPA2 Enterprise, Personal, WPS, Chipset RCE{COLOR_GREEN}                                           │{COLOR_RESET}")
+    print(f"{COLOR_BOLD}{COLOR_GREEN}│  TARGET: {COLOR_DARK_RED}WPA/WPA2, Personal, WPS, Chipset RCE{COLOR_GREEN}                                                      │{COLOR_RESET}")
     print(f"{COLOR_BOLD}{COLOR_GREEN}│  COUNTERMEASURES: {COLOR_DARK_BLUE}Requires physical proximity{COLOR_GREEN}                                                      │{COLOR_RESET}")
     print(f"{COLOR_BOLD}{COLOR_GREEN}│  DETECTABILITY: {COLOR_DARK_YELLOW}Moderate  {COLOR_TEAL}- deauth patterns detectable{COLOR_GREEN}                                             │{COLOR_RESET}")
     print(f"{COLOR_BOLD}{COLOR_GREEN}│  SESSION: {COLOR_SILVER}{SESSION_ID}{' ' * (86 - len(SESSION_ID))}{COLOR_GREEN}   │{COLOR_RESET}")
