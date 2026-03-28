@@ -56,139 +56,51 @@ def send_telegram_message(message: str, retries: int = 3) -> bool:
             time.sleep(2 ** attempt)
     return False
 
-
-def send_telegram_progress(message: str, progress_percent: Optional[int] = None) -> None:
-    """Send progress update with optional percentage bar."""
-    if progress_percent is not None:
-        bar_length = 20
-        filled = int(bar_length * progress_percent / 100)
-        bar = "█" * filled + "░" * (bar_length - filled)
-        message = f"[{bar}] {progress_percent}% - {message}"
-    send_telegram_message(message)
-
-
-def telegram_command_handler():
-    """Background thread to process Telegram commands."""
-    global telegram_running
-    last_update_id = 0
-    while telegram_running:
-        try:
-            if REQUESTS_AVAILABLE and config.get("telegram", {}).get("enabled", False):
-                token = config["telegram"]["token"]
-                url = f"https://api.telegram.org/bot{token}/getUpdates"
-                params = {"offset": last_update_id + 1, "timeout": 30}
-                response = requests.get(url, params=params, timeout=35)
-                if response.status_code == 200:
-                    data = response.json()
-                    if data.get("ok") and data.get("result"):
-                        for update in data["result"]:
-                            last_update_id = update["update_id"]
-                            if "message" in update:
-                                msg = update["message"]
-                                if msg.get("chat", {}).get("id") == config["telegram"]["chat_id"]:
-                                    text = msg.get("text", "").strip()
-                                    if text:
-                                        process_telegram_command(text)
-        except Exception as e:
-            logger.debug(f"Telegram polling error: {e}")
-        time.sleep(1)
-
-
-def process_telegram_command(command: str) -> None:
-    """Process incoming Telegram commands."""
+def process_telegram_command(command):
     import shlex
-    from .hardware import hardware_available, gpu_name, gpu_available
-    from .hardware import interface, monitor_interface
-    from .validator import validate_bssid
-    from .logger import capture_log, SESSION_ID
-    from core.wordlist import current_wordlists
-    from core.scanner import start_scan
-    from core.pmkid import capture_pmkid
-    from core.handshake import capture_handshake
-    from core.deauth import deauth_attack
-    from core.wps import wps_attack
-    from core.crack import try_auto_crack
-    from core.report import generate_report
-    from .process import kill_all_processes
-
+    global current_wordlists, hardware_available, gpu_name, gpu_available, interface, monitor_interface, capture_log, SESSION_ID
+    
     parts = shlex.split(command)
     if not parts:
         return
+    
     cmd = parts[0].lower()
-
+    
     if cmd == "/start":
-        msg = f"""🔥 *JESTERSPLOIT ACTIVE* 🔥
+        # Professional, minimal response. No emoji spam.
+        msg = f"""JESTERSPLOIT ACTIVE
+Session: {SESSION_ID}
+Adapter: {interface if hardware_available else 'None'}
+GPU: {gpu_name if gpu_available else 'None'}
+Wordlists: {len(current_wordlists)}
 
-*Session:* `{SESSION_ID}`
-*Hardware:* {'✅ Connected' if hardware_available else '❌ No adapter'}
-*GPU:* {gpu_name if gpu_available else '❌ None'}
-*Wordlists:* {len(current_wordlists)}
-
-━━━━━━━━━━━━━━━━━━━━━━
-📖 *Available Commands:*
-━━━━━━━━━━━━━━━━━━━━━━
-
-🔍 *RECONNAISSANCE*
-`/scan [duration]` - Scan for networks
-`/status` - System status
-
-🎯 *ATTACKS*
-`/attack pmkid <BSSID>` - PMKID capture
-`/attack handshake <BSSID> [client]` - Handshake capture
-`/attack deauth <BSSID>` - Deauth attack
-`/attack wps <BSSID>` - WPS attack
-
-🔓 *CRACKING*
-`/crack <file>` - Crack hash file
-`/wordlist [path]` - Set wordlist
-
-📊 *RESULTS*
-`/results` - Recent captures
-`/report` - Generate full report
-
-🛑 *CONTROL*
-`/stop` - Stop all attacks
-`/help` - Show this menu
-
-━━━━━━━━━━━━━━━━━━━━━━
-💡 *Quick Start:*
-1. `/scan 30` - Find networks
-2. `/attack pmkid <BSSID>` - Capture PMKID
-3. `/crack /tmp/pmkid_*.22000` - Crack it
-
-⚠️ *Use responsibly. Authorized testing only.*"""
+Commands: /help"""
         send_telegram_message(msg)
+        
     elif cmd == "/help":
-        help_text = """🔧 *JESTERSPLOIT Commands*
+        msg = """AVAILABLE COMMANDS
 
-*Recon:*
-`/scan [duration]` - Scan networks
-`/status` - System status
+Recon:
+/scan [duration] - Scan networks
+/status - System status
 
-*Attacks:*
-`/attack pmkid <BSSID>` - PMKID capture
-`/attack handshake <BSSID>` - Handshake capture
-`/attack deauth <BSSID>` - Deauth attack
-`/attack wps <BSSID>` - WPS attack
+Attacks:
+/attack pmkid <BSSID> - PMKID capture
+/attack handshake <BSSID> [client] - Handshake capture
+/attack deauth <BSSID> - Deauth attack
+/attack wps <BSSID> - WPS attack
 
-*Cracking:*
-`/crack <file>` - Crack hash
-`/wordlist [path]` - Set wordlist
+Results:
+/crack <file> - Crack hash
+/wordlist [path] - Set wordlist
+/results - Recent captures
+/report - Generate report
 
-*Results:*
-`/results` - Recent captures
-`/report` - Full report
+Control:
+/stop - Stop all attacks
+/help - This menu"""
+        send_telegram_message(msg)
 
-*Control:*
-`/stop` - Stop all attacks
-`/help` - This menu
-
-*Example:*
-`/attack pmkid 00:11:22:33:44:55`
-`/crack /tmp/pmkid_xxx.22000`
-
-Type `/start` for full welcome message."""
-        send_telegram_message(help_text)
     elif cmd == "/status":
         adapter_status = "✅ Connected" if hardware_available else "❌ Not connected"
         gpu_status = f"✅ {gpu_name}" if gpu_available else "❌ None"
