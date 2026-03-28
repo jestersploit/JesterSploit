@@ -777,27 +777,15 @@ def main():
         print_status("Telegram bot active", "success")
         # Send welcome message after a short delay
         def send_welcome():
-            time.sleep(3)
-            welcome = f"""🔥 *JESTERSPLOIT ONLINE* 🔥
+    time.sleep(3)
+    welcome = f"""JESTERSPLOIT ONLINE
+Session: {SESSION_ID}
+Hardware: {'Connected' if hardware_available else 'No adapter'}
+GPU: {gpu_name if gpu_available else 'None'}
+Wordlists: {len(current_wordlists)}
 
-━━━━━━━━━━━━━━━━━━━━━━
-*SYSTEM STATUS*
-━━━━━━━━━━━━━━━━━━━━━━
-🆔 *Session:* `{SESSION_ID}`
-🔌 *Hardware:* {'✅ Connected' if hardware_available else '❌ No adapter'}
-{'   📡 ' + interface if hardware_available else ''}
-🖥️ *GPU:* {gpu_name if gpu_available else '❌ None'}
-📚 *Wordlists:* {len(current_wordlists)} file(s)
-
-━━━━━━━━━━━━━━━━━━━━━━
-*📖 TYPE /start TO BEGIN*
-━━━━━━━━━━━━━━━━━━━━━━
-
-💡 *Quick commands:*
-`/help` - Show all commands
-`/status` - Detailed system status
-`/scan 30` - Scan for networks
-`/attack pmkid <BSSID>` - Start PMKID capture
+Type /help for commands"""
+    send_telegram_message(welcome)
 
 ⚠️ *Use responsibly. Authorized testing only.*"""
             send_telegram_message(welcome)
