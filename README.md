@@ -232,7 +232,7 @@ cd JesterSploit
 
 ## Setup environment 
 ```bash
-chmod +x install.sh
+chmod +x Install.sh
 ./install.sh
 
 ```
