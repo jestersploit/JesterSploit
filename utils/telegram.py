@@ -6,6 +6,7 @@ import time
 import json
 import threading
 import logging
+logger = logging.getLogger(__name__)
 from typing import Optional
 
 try:
