@@ -1,9 +1,9 @@
 ![JesterSploit Main Menu](main_menu.png)
-# JesterSploit – Advanced WiFi Penetration Testing Framework
+# JesterSploit – The FIRST JesterSploit's WiFi Penetration Testing Framework
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**JesterSploit** is a modular WiFi penetration testing framework designed for flexibility, stability, and extensibility. It includes multiple attack modules (PMKID, handshake capture, WPS, deauth, evil twin, KRACK, FragAttacks, and more), with a clean CLI interface, logging system, and hardware-aware execution.
+**JesterSploit** is the first JesterSploit's modular WiFi penetration testing framework designed for flexibility, stability, and extensibility. It includes multiple attack modules (PMKID, handshake capture, WPS, deauth, evil twin, KRACK, FragAttacks, and more), with a clean CLI interface, logging system, and hardware-aware execution.
 
 ---
 
