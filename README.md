@@ -230,9 +230,10 @@ git clone https://github.com/jestersploit/JesterSploit.git
 cd JesterSploit
 ```
 
-## Install Python dependencies
+## Setup environment 
 ```bash
-pip install -r requirements.txt
+chmod +x install.sh
+./install.sh
 
 ```
 ## Install required system tools (if missing)
