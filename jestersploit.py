@@ -640,13 +640,13 @@ def show_main_menu():
 """
     print_centered_banner(banner, width=102)
     print(f"{COLOR_CYAN}{'=' * 102}{COLOR_RESET}")
-    print(f"{COLOR_BOLD}{COLOR_CRIMSON}                      JESTERSPLOIT{COLOR_RESET} -{COLOR_CYAN} Advanced WiFi Penetration Testing Framework{COLOR_RESET}")
+    print(f"{COLOR_BOLD}{COLOR_CRIMSON}                      JESTERSPLOIT{COLOR_RESET} -{COLOR_CYAN} Moderate WiFi Penetration Testing Framework{COLOR_RESET}")
     print(f"{COLOR_CYAN}{'=' * 102}{COLOR_RESET}")
     print()
 
     # Classification Box
     print(f"{COLOR_BOLD}{COLOR_GREEN}┌────────────────────────────────────────────────────────────────────────────────────────────────────┐{COLOR_RESET}")
-    print(f"{COLOR_BOLD}{COLOR_GREEN}│  CLASSIFICATION: {COLOR_BLACK}Black Hat{COLOR_GREEN}                                                                         │{COLOR_RESET}")
+    print(f"{COLOR_BOLD}{COLOR_GREEN}│  CLASSIFICATION: {COLOR_BLACK}Beginner-Friendly{COLOR_GREEN}                                                                 │{COLOR_RESET}")
     print(f"{COLOR_BOLD}{COLOR_GREEN}│  TIER: {COLOR_CORAL}Independent Operator{COLOR_GREEN}                                                                        │{COLOR_RESET}")
     print(f"{COLOR_BOLD}{COLOR_GREEN}│  THREAT: {COLOR_BROWN}Mid{COLOR_GREEN}                                                                                       │{COLOR_RESET}")
     print(f"{COLOR_BOLD}{COLOR_GREEN}│  CAPABILITY: {COLOR_SALMON}Tactical WiFi Compromise{COLOR_GREEN}                                                              │{COLOR_RESET}")
